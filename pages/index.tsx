@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Banner from "../components/banner/banner";
+import NavBar from "../components/nav/navbar";
 
 export default function Home() {
   return (
@@ -10,7 +11,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1>Netflix</h1>
+      <NavBar username="test@test.com" />
       <Banner
         title="Clifford the red dog"
         subTitle="A very cute dog"
