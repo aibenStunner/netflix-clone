@@ -8,7 +8,7 @@ interface ISectionCardsProps {
   size: "small" | "medium" | "large";
 }
 
-const SectionCards = ({ title, videos, size }: ISectionCardsProps) => {
+const SectionCards = ({ title, videos = [], size }: ISectionCardsProps) => {
   return (
     <section className={styles.container}>
       <h2 className={styles.title}>{title}</h2>

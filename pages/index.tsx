@@ -1,14 +1,36 @@
 import Head from "next/head";
+import { IVideo } from "../components/@types";
 import Banner from "../components/banner/banner";
 import SectionCards from "../components/card/section-cards";
 import NavBar from "../components/nav/navbar";
-import { getVideos } from "../lib/videos";
+import { getPopularVideos, getVideos } from "../lib/videos";
 
 import styles from "../styles/Home.module.css";
 
-export default function Home() {
-  const disneyVideos = getVideos();
+interface IHomeProps {
+  disneyVideos: IVideo[];
+  travelVideos: IVideo[];
+  productivityVideos: IVideo[];
+  popularVideos: IVideo[];
+}
 
+export async function getServerSideProps() {
+  const disneyVideos = await getVideos("disney trailer");
+  const productivityVideos = await getVideos("productivity");
+  const travelVideos = await getVideos("travel");
+  const popularVideos = await getPopularVideos();
+
+  return {
+    props: { disneyVideos, travelVideos, productivityVideos, popularVideos },
+  };
+}
+
+export default function Home({
+  disneyVideos,
+  travelVideos,
+  productivityVideos,
+  popularVideos,
+}: IHomeProps) {
   return (
     <>
       <Head>
@@ -17,15 +39,24 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <NavBar username="test@test.com" />
-      <Banner
-        title="Clifford the red dog"
-        subTitle="A very cute dog"
-        imgUrl="/static/clifford.webp"
-      />
-      <div className={styles.sectionWrapper}>
-        <SectionCards title="Placeholder" videos={disneyVideos} size="large" />
-        <SectionCards title="Placeholder" videos={disneyVideos} size="medium" />
+
+      <div className={styles.main}>
+        <NavBar username="test@test.com" />
+        <Banner
+          title="Clifford the red dog"
+          subTitle="A very cute dog"
+          imgUrl="/static/clifford.webp"
+        />
+        <div className={styles.sectionWrapper}>
+          <SectionCards title="Disney" videos={disneyVideos} size="large" />
+          <SectionCards title="Travel" videos={travelVideos} size="small" />
+          <SectionCards
+            title="Productivity"
+            videos={productivityVideos}
+            size="medium"
+          />
+          <SectionCards title="Popular" videos={popularVideos} size="small" />
+        </div>
       </div>
     </>
   );
