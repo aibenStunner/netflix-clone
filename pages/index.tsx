@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Banner from "../components/banner/banner";
+import Card from "../components/card/card";
 import NavBar from "../components/nav/navbar";
 
 export default function Home() {
