@@ -1,5 +1,4 @@
 import { IVideo } from "../components/@types";
-import videoData from "../data/videos.json";
 
 export const getCommonVideos = async (url: string): Promise<IVideo[]> => {
   try {
