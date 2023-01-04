@@ -43,6 +43,7 @@ export default function Home({
       <div className={styles.main}>
         <NavBar />
         <Banner
+          videoId="4zH5iYM4wJo"
           title="Clifford the red dog"
           subTitle="A very cute dog"
           imgUrl="/static/clifford.webp"
