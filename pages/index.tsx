@@ -3,6 +3,7 @@ import { IVideo } from "../components/@types";
 import Banner from "../components/banner/banner";
 import SectionCards from "../components/card/section-cards";
 import NavBar from "../components/nav/navbar";
+import { startFetchMyQuery } from "../lib/db/hasura";
 import { getPopularVideos, getVideos } from "../lib/videos";
 
 import styles from "../styles/Home.module.css";
@@ -31,6 +32,8 @@ export default function Home({
   productivityVideos,
   popularVideos,
 }: IHomeProps) {
+  startFetchMyQuery();
+
   return (
     <>
       <Head>
