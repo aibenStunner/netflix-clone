@@ -19,7 +19,7 @@ const NavBar = () => {
 
         if (email) setUsername(email);
       } catch (e) {
-        console.log("Error retrieving email", e);
+        console.error("Error retrieving email", e);
       }
     }
 
@@ -47,7 +47,7 @@ const NavBar = () => {
       await magic?.user.logout();
       router.push("/login");
     } catch (e) {
-      console.log("Error signing out user", e);
+      console.error("Error signing out user", e);
     }
   };
 

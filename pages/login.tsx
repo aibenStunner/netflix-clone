@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 import { magic } from "../lib/magic-client";
+import { magicAdmin } from "../lib/magic";
 
 const Login = () => {
   const router = useRouter();
@@ -33,10 +34,27 @@ const Login = () => {
 
     if (email) {
       try {
-        const didToken = await magic?.auth.loginWithMagicLink({
+        const didToken = (await magic?.auth.loginWithMagicLink({
           email,
-        });
-        if (didToken) router.push("/");
+        })) as string;
+
+        if (didToken) {
+          const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${didToken}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          const loggedInResponse = await response.json();
+          if (loggedInResponse.done) {
+            router.push("/");
+          } else {
+            setIsLoading(false);
+            setUserMsg("Something went wrong logging in");
+          }
+        }
       } catch (error) {
         console.error("Something went wrong logging in", error);
         setIsLoading(false);
