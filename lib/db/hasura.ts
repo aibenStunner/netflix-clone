@@ -1,5 +1,29 @@
 import { IStatsPayload } from "../../components/@types";
 
+export async function getWatchedVideos(userId: string, token: string) {
+  const operationsDoc = `
+  query watchedVideos($userId: String!) {
+    stats(where: {
+      watched: {_eq: true}, 
+      userId: {_eq: $userId},
+    }) {
+      videoId
+    }
+  }
+`;
+
+  const response = await queryHasuraGraphQL(
+    operationsDoc,
+    "watchedVideos",
+    {
+      userId,
+    },
+    token
+  );
+
+  return response?.data?.stats;
+}
+
 export async function insertStats(
   token: string,
   { favourited, userId, watched, videoId }: IStatsPayload

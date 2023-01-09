@@ -1,27 +1,56 @@
+import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { IVideo } from "../components/@types";
 import Banner from "../components/banner/banner";
 import SectionCards from "../components/card/section-cards";
 import NavBar from "../components/nav/navbar";
-import { getPopularVideos, getVideos } from "../lib/videos";
+import {
+  getPopularVideos,
+  getVideos,
+  getWatchItAgainVideos,
+} from "../lib/videos";
 
 import styles from "../styles/Home.module.css";
+import { redirectUser } from "../utils/redirectUser";
 
 interface IHomeProps {
   disneyVideos: IVideo[];
   travelVideos: IVideo[];
   productivityVideos: IVideo[];
   popularVideos: IVideo[];
+  watchItAgainVideos: IVideo[];
 }
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  let watchItAgainVideos: IVideo[] = [];
+  const { userId, token } = await redirectUser(context);
+
+  if (!userId) {
+    return {
+      props: {},
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  if (token && userId)
+    watchItAgainVideos = await getWatchItAgainVideos(userId, token);
+
   const disneyVideos = await getVideos("disney trailer");
   const productivityVideos = await getVideos("productivity");
   const travelVideos = await getVideos("travel");
   const popularVideos = await getPopularVideos();
 
   return {
-    props: { disneyVideos, travelVideos, productivityVideos, popularVideos },
+    props: {
+      disneyVideos,
+      travelVideos,
+      productivityVideos,
+      popularVideos,
+      watchItAgainVideos,
+    },
   };
 }
 
@@ -30,6 +59,7 @@ export default function Home({
   travelVideos,
   productivityVideos,
   popularVideos,
+  watchItAgainVideos,
 }: IHomeProps) {
   return (
     <>
@@ -50,6 +80,13 @@ export default function Home({
         />
         <div className={styles.sectionWrapper}>
           <SectionCards title="Disney" videos={disneyVideos} size="large" />
+          {watchItAgainVideos.length > 0 && (
+            <SectionCards
+              title="Watch it again"
+              videos={watchItAgainVideos}
+              size="small"
+            />
+          )}
           <SectionCards title="Travel" videos={travelVideos} size="small" />
           <SectionCards
             title="Productivity"

@@ -1,5 +1,6 @@
 import { IVideo } from "../components/@types";
 import videoTestData from "../data/videos.json";
+import { getWatchedVideos } from "./db/hasura";
 
 const fetchVideos = async (url: string) => {
   const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
@@ -29,7 +30,7 @@ export const getCommonVideos = async (url: string): Promise<IVideo[]> => {
       return {
         id,
         title: snippet?.title,
-        imgUrl: snippet.thumbnails.high.url,
+        imgUrl: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
         description: snippet.description,
         publishTime: snippet.publishedAt,
         channelTitle: snippet.channelTitle,
@@ -59,4 +60,16 @@ export const getYoutubeVideoById = (videoId: string) => {
   const URL = `videos?part=snippet%2CcontentDetails%2Cstatistics&id=${videoId}`;
 
   return getCommonVideos(URL);
+};
+
+export const getWatchItAgainVideos = async (userId: string, token: string) => {
+  const videos = await getWatchedVideos(userId, token);
+  return (
+    videos?.map((video: any) => {
+      return {
+        id: video.videoId,
+        imgUrl: `https://i.ytimg.com/vi/${video.videoId}/maxresdefault.jpg`,
+      };
+    }) || []
+  );
 };
