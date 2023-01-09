@@ -3,6 +3,7 @@ import { magicAdmin } from "../../lib/magic";
 import jwt from "jsonwebtoken";
 import { createNewUser, isNewUser } from "../../lib/db/hasura";
 import { setTokenCookie } from "../../lib/cookies";
+import { IDecodedToken } from "../../components/@types";
 
 export default async function login(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
@@ -22,7 +23,7 @@ export default async function login(req: NextApiRequest, res: NextApiResponse) {
             "x-hasura-default-role": "user",
             "x-hasura-user-id": `${metadata.issuer}`,
           },
-        },
+        } as IDecodedToken,
         process.env.JWT_SECRET as string
       );
 

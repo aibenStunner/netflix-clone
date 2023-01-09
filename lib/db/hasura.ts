@@ -1,3 +1,92 @@
+import { IStatsPayload } from "../../components/@types";
+
+export async function insertStats(
+  token: string,
+  { favourited, userId, watched, videoId }: IStatsPayload
+) {
+  const operationsDoc = `
+  mutation insertStats($favourited: Int!, $userId: String!, $watched: Boolean!, $videoId: String!) {
+    insert_stats_one(object: {
+      favourited: $favourited, 
+      userId: $userId, 
+      watched: $watched, 
+      videoId: $videoId
+    }) {
+        favourited
+        id
+        userId
+    }
+  }
+`;
+
+  return await queryHasuraGraphQL(
+    operationsDoc,
+    "insertStats",
+    { favourited, userId, watched, videoId },
+    token
+  );
+}
+
+export async function updateStats(
+  token: string,
+  { favourited, userId, watched, videoId }: IStatsPayload
+) {
+  const operationsDoc = `
+mutation updateStats($favourited: Int!, $userId: String!, $watched: Boolean!, $videoId: String!) {
+  update_stats(
+    _set: {watched: $watched, favourited: $favourited}, 
+    where: {
+      userId: {_eq: $userId}, 
+      videoId: {_eq: $videoId}
+    }) {
+    returning {
+      favourited,
+      userId,
+      watched,
+      videoId
+    }
+  }
+}
+`;
+
+  return await queryHasuraGraphQL(
+    operationsDoc,
+    "updateStats",
+    { favourited, userId, watched, videoId },
+    token
+  );
+}
+
+export async function findVideoIdByUser(
+  token: string,
+  userId: string | null,
+  videoId: string | null
+) {
+  const operationsDoc = `
+  query findVideoIdByUserId($userId: String!, $videoId: String!) {
+    stats(where: { userId: {_eq: $userId}, videoId: {_eq: $videoId }}) {
+      id
+      userId
+      videoId
+      favourited
+      watched
+    }
+  }
+`;
+
+  const response = await queryHasuraGraphQL(
+    operationsDoc,
+    "findVideoIdByUserId",
+    {
+      videoId,
+      userId,
+    },
+    token
+  );
+
+  return response?.data?.stats;
+}
+
 export async function createNewUser(token: string, metadata: any) {
   const operationsDoc = `
   mutation createNewUser($issuer: String!, $email: String!, $publicAddress: String!) {
