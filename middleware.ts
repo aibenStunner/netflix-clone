@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "../lib/utils";
+import { verifyToken } from "./lib/utils";
 
-export async function middleware(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
+export async function middleware(request: NextRequest) {
+  const token = request.cookies.get("token")?.value;
   const userId = await verifyToken(token as string);
-  const { pathname } = req.nextUrl;
+  const { pathname } = request.nextUrl;
 
   if (
     pathname.includes("/api/login") ||
@@ -15,6 +15,8 @@ export async function middleware(req: NextRequest) {
   }
 
   if ((!token || !userId) && pathname !== "/login") {
-    return NextResponse.redirect("/login");
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.rewrite(url);
   }
 }

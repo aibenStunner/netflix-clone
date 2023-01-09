@@ -1,15 +1,17 @@
-import jwt from "jsonwebtoken";
-import { IDecodedToken } from "../components/@types";
+import { jwtVerify } from "jose";
 
 export async function verifyToken(token: string) {
-  if (token) {
-    const decodedToken = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    ) as IDecodedToken;
-
-    const userId = decodedToken.issuer;
-    return userId;
+  try {
+    if (token) {
+      const verified = await jwtVerify(
+        token,
+        new TextEncoder().encode(process.env.JWT_SECRET)
+      );
+      return verified.payload && verified.payload?.issuer;
+    }
+    return null;
+  } catch (err) {
+    console.error({ err });
+    return null;
   }
-  return null;
 }
