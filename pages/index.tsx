@@ -25,16 +25,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   let watchItAgainVideos: IVideo[] = [];
   const { userId, token } = await redirectUser(context);
 
-  if (!userId) {
-    return {
-      props: {},
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-
   if (token && userId)
     watchItAgainVideos = await getWatchItAgainVideos(userId, token);
 
