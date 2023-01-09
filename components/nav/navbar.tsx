@@ -10,16 +10,21 @@ const NavBar = () => {
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
   const [username, setUsername] = useState("");
+  const [didToken, setDidToken] = useState("");
 
   useEffect(() => {
     async function getUserEmail() {
       try {
         const { email } =
           (await magic?.user.getMetadata()) as MagicUserMetadata;
+        const didToken = await magic?.user.getIdToken();
 
-        if (email) setUsername(email);
-      } catch (e) {
-        console.error("Error retrieving email", e);
+        if (email && didToken) {
+          setDidToken(didToken);
+          setUsername(email);
+        }
+      } catch (error) {
+        console.log("Error retrieving email:", error);
       }
     }
 
@@ -44,17 +49,25 @@ const NavBar = () => {
   const handleSignOut = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
-      await magic?.user.logout();
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${didToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      await response.json();
+    } catch (error) {
+      console.error("Error logging out", error);
       router.push("/login");
-    } catch (e) {
-      console.error("Error signing out user", e);
     }
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <a className={styles.logoLink}>
+        <Link className={styles.logoLink} href="/">
           <div className={styles.logoWrapper}>
             <Image
               src="/static/netflix.svg"
@@ -63,7 +76,7 @@ const NavBar = () => {
               height={34}
             />
           </div>
-        </a>
+        </Link>
         <ul className={styles.navItems}>
           <li className={styles.navItem} onClick={handleOnClickHome}>
             Home
@@ -78,7 +91,7 @@ const NavBar = () => {
               <p className={styles.username}>{username}</p>
               <Image
                 src="/static/expand_more.svg"
-                alt="Expand more"
+                alt="Expand dropdown"
                 width={24}
                 height={24}
               />
